@@ -196,6 +196,10 @@ a.card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgb(0 0 0 / 0
 .done-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 .confetti { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 20; }
 
+.palette.many { gap: 8px; }
+.palette.many .swatch { width: 48px; height: 48px; }
+.palette.many .swatch .num { font-size: 17px; }
+
 /* ---------- small screens ---------- */
 @media (max-width: 640px) {
   .toolbar { gap: 6px 8px; padding: 6px 8px; }

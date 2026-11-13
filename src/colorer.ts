@@ -76,7 +76,7 @@ export function mountColorer(root: HTMLElement, page: ColoringPage): () => void 
 
   const toast = h('div', { class: 'toast', role: 'status', 'aria-live': 'polite' });
   const stage = h('main', { class: 'stage' }, svg, toast);
-  const palette = h('nav', { class: 'palette', 'aria-label': 'Colors' });
+  const palette = h('nav', { class: page.palette.length > 12 ? 'palette many' : 'palette', 'aria-label': 'Colors' });
   const swatches = page.palette.map((c, i) => {
     const n = i + 1;
     const count = h('span', { class: 'count' });
