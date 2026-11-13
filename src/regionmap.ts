@@ -118,6 +118,8 @@ export class RegionMap {
     this.bounds = [];
     for (let i = 0; i < n; i++) {
       if (bestK[i] < 0) {
+        // A fully covered region can never be tapped, so the page could never be finished.
+        console.warn(`[paint-by-number] ${page.id}: region ${page.regions[i].id} is completely hidden`);
         this.labels.push(null);
         this.bounds.push(null);
         continue;
