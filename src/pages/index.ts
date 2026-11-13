@@ -9,7 +9,9 @@ import { castle } from './castle';
 import { duel } from './duel';
 import { siege } from './siege';
 import { dragon } from './dragon';
+import { horses } from './horses';
+import { owl } from './owl';
 
-export const PAGES: ColoringPage[] = [sunset, fish, cottage, flowers, rocket, butterfly, castle, duel, siege, dragon];
+export const PAGES: ColoringPage[] = [sunset, fish, cottage, flowers, rocket, butterfly, castle, duel, siege, dragon, horses, owl];
 
 export const getPage = (id: string) => PAGES.find((p) => p.id === id);
