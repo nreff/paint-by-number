@@ -21,6 +21,7 @@ npm run build          # typecheck + production build into dist/
 | Pick color | Click a swatch or press `1`–`9` | Tap a swatch |
 | Undo | `Ctrl/Cmd+Z` | Undo button |
 | Find next space | `F` or the magnifier button | Magnifier button |
+| Hints (stripes on matching spaces) | `H` or the Hints toggle | Hints toggle |
 
 "Free color" lets you paint any space with any color. Progress is saved in the browser (localStorage).
 

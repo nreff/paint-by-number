@@ -31,16 +31,20 @@ export function saveProgress(pageId: string, progress: SavedProgress): void {
 
 export interface Prefs {
   freeMode: boolean;
+  /** Stripe the spaces that match the selected color. */
+  hints: boolean;
 }
+
+const DEFAULT_PREFS: Prefs = { freeMode: false, hints: true };
 
 export function loadPrefs(): Prefs {
   try {
     const raw = localStorage.getItem(PREFS);
-    if (raw) return { freeMode: false, ...JSON.parse(raw) };
+    if (raw) return { ...DEFAULT_PREFS, ...JSON.parse(raw) };
   } catch {
     /* ignore */
   }
-  return { freeMode: false };
+  return { ...DEFAULT_PREFS };
 }
 
 export function savePrefs(prefs: Prefs): void {

@@ -13,7 +13,8 @@ const FORGIVE_PX = 12; // how far (screen px) a tap may miss a small matching re
 
 export function mountColorer(root: HTMLElement, page: ColoringPage): () => void {
   const session = new ColoringSession(page);
-  session.freeMode = loadPrefs().freeMode;
+  const prefs = loadPrefs();
+  session.freeMode = prefs.freeMode;
   const map = regionMapFor(page);
   const box = map.box;
 
@@ -33,13 +34,16 @@ export function mountColorer(root: HTMLElement, page: ColoringPage): () => void 
   const resetBtn = iconButton(ICONS.reset, 'Start over');
   const freeInput = h('input', { type: 'checkbox' });
   const freeToggle = h('label', { class: 'toggle', title: 'Paint any region with any color' }, freeInput, h('span', { text: 'Free color' }));
+  const hintsInput = h('input', { type: 'checkbox' });
+  hintsInput.checked = prefs.hints;
+  const hintsToggle = h('label', { class: 'toggle', title: 'Stripe the spaces that match the selected color (H)' }, hintsInput, h('span', { text: 'Hints' }));
 
   const toolbar = h(
     'header',
     { class: 'toolbar' },
     h('div', { class: 'tb-left' }, back, title),
     progress,
-    h('div', { class: 'tb-right' }, undoBtn, findBtn, zoomOutBtn, zoomInBtn, fitBtn, freeToggle, resetBtn),
+    h('div', { class: 'tb-right' }, undoBtn, findBtn, zoomOutBtn, zoomInBtn, fitBtn, hintsToggle, freeToggle, resetBtn),
   );
 
   const svg = svgEl('svg', { class: 'art', viewBox: page.viewBox, preserveAspectRatio: 'xMidYMid meet', role: 'img', 'aria-label': page.title });
@@ -124,7 +128,7 @@ export function mountColorer(root: HTMLElement, page: ColoringPage): () => void 
       const fill = session.fillOf(r.id);
       const p = paths[i];
       if (fill !== undefined) p.style.fill = page.palette[fill - 1].hex;
-      else if (!session.freeMode && r.color === sel) p.style.fill = 'url(#hl)';
+      else if (prefs.hints && !session.freeMode && r.color === sel) p.style.fill = 'url(#hl)';
       else p.style.fill = '#ffffff';
     });
     updateLabelVisibility();
@@ -248,8 +252,16 @@ export function mountColorer(root: HTMLElement, page: ColoringPage): () => void 
   });
   freeInput.addEventListener('change', () => {
     session.setFreeMode(freeInput.checked);
-    savePrefs({ freeMode: freeInput.checked });
+    prefs.freeMode = freeInput.checked;
+    savePrefs(prefs);
     say(freeInput.checked ? 'Free color: paint anything any color' : 'Numbers on: match the colors');
+  });
+
+  hintsInput.addEventListener('change', () => {
+    prefs.hints = hintsInput.checked;
+    savePrefs(prefs);
+    render();
+    say(prefs.hints ? 'Hints on' : 'Hints off');
   });
 
   const onKey = (e: KeyboardEvent) => {
@@ -259,6 +271,7 @@ export function mountColorer(root: HTMLElement, page: ColoringPage): () => void 
       undoBtn.click();
     } else if (/^[1-9]$/.test(e.key) && !e.ctrlKey && !e.metaKey) session.select(Number(e.key));
     else if (e.key === 'f') findNext();
+    else if (e.key === 'h') hintsInput.click();
     else if (e.key === '+' || e.key === '=') view.zoomBy(1.5);
     else if (e.key === '-') view.zoomBy(1 / 1.5);
     else if (e.key === '0') view.reset();
