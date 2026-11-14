@@ -6,10 +6,14 @@ A static paint-by-number web app: pick a page, choose a color, fill every number
 
 Pick a picture from the gallery, choose a color from the palette, and fill in every space marked with that number. There are 12 pages, from simple ones like a sunset or a fish to detailed ones like castle sieges, a dragon fight, horses and a night owl. Hints stripe the spaces that match the selected color. A Free color mode lets you paint anything any color. Progress saves in your browser, and the app works with a mouse or with touch (pinch to zoom on phones).
 
+<p align="center"><b>Home page</b></p>
 <p align="center">
-  <img src="assets/homepage.PNG" alt="Gallery of coloring pages with progress bars" height="320">
-  &nbsp;
-  <img src="assets/castle.PNG" alt="The Knight's Castle page fully colored" height="320">
+  <img src="assets/homepage.PNG" alt="Gallery of coloring pages with progress bars" width="640">
+</p>
+
+<p align="center"><b>Knight's Castle</b></p>
+<p align="center">
+  <img src="assets/castle.PNG" alt="The Knight's Castle page fully colored" width="640">
 </p>
 
 ## Run locally
