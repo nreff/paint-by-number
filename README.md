@@ -2,6 +2,8 @@
 
 A static paint-by-number web app: pick a page, choose a color, fill every numbered space. Built with Vite + TypeScript (no framework) and deployed to GitHub Pages.
 
+**▶ Play it here: https://nreff.github.io/paint-by-number/**
+
 ## Run locally
 
 ```bash
