@@ -38,16 +38,60 @@ const clock = (x: number, y: number): Entry[] => [
   [circle(x, y, 2.6), K.gold],
 ];
 
-/** Wall banner with a red-and-blue swirl emblem. */
-const banner = (x: number, y: number): Entry[] => [
-  [poly([[x, y], [x + 46, y], [x + 46, y + 72], [x + 23, y + 62], [x, y + 72]]), K.white],
-  [`M${x + 9} ${y + 30}A14 14 0 0 1 ${x + 37} ${y + 30}A7 7 0 0 1 ${x + 23} ${y + 30}A7 7 0 0 0 ${x + 9} ${y + 30}Z`, K.red],
-  [`M${x + 9} ${y + 30}A7 7 0 0 0 ${x + 23} ${y + 30}A7 7 0 0 1 ${x + 37} ${y + 30}A14 14 0 0 1 ${x + 9} ${y + 30}Z`, K.blue],
-  ...([[x + 6, y + 6], [x + 40, y + 6], [x + 6, y + 52], [x + 40, y + 52]] as const).flatMap(([bx, by]): Entry[] => [
-    [rect(bx - 3, by - 4, 2, 8), K.black],
-    [rect(bx + 1, by - 4, 2, 8), K.black],
-  ]),
-];
+/**
+ * Flag of South Korea (Taegukgi): 3:2 white field, a red-over-blue taegeuk whose
+ * dividing S-curve follows the flag's diagonal, and the four trigrams
+ * (geon, gam, ri, gon) set square to the diagonals in the corners.
+ */
+const koreanFlag = (x: number, y: number, w: number): Entry[] => {
+  const h = (w * 2) / 3;
+  const c: Pt = [x + w / 2, y + h / 2];
+  const r = h / 4;
+  const th = Math.atan2(h, w);
+  const u: Pt = [Math.cos(th), Math.sin(th)]; // toward the bottom-right corner
+  const v: Pt = [Math.cos(th), -Math.sin(th)]; // toward the top-right corner
+  const at = (o: Pt, rad: number, ang: number): Pt => [o[0] + rad * Math.cos(ang), o[1] + rad * Math.sin(ang)];
+  const arc = (o: Pt, rad: number, from: number, to: number): Pt[] =>
+    Array.from({ length: 25 }, (_, i) => at(o, rad, from + ((to - from) * i) / 24));
+  const m1: Pt = [c[0] - (u[0] * r) / 2, c[1] - (u[1] * r) / 2];
+  const m2: Pt = [c[0] + (u[0] * r) / 2, c[1] + (u[1] * r) / 2];
+  // Red: over the top from the upper-left end to the lower-right end, then the S back:
+  // bulging up into the red near the right, down into the blue near the left.
+  const red = [
+    ...arc(c, r, th + Math.PI, th + 2 * Math.PI),
+    ...arc(m2, r / 2, th, th - Math.PI).slice(1),
+    ...arc(m1, r / 2, th, th + Math.PI).slice(1, -1),
+  ];
+
+  // Trigram bars: length h/4, thickness h/24, gap h/48, square to their diagonal.
+  const len = h / 4;
+  const t = h / 24;
+  const gap = h / 48;
+  const centerDist = r + h / 8 + (3 * t + 2 * gap) / 2;
+  const trigram = (dir: Pt, sign: 1 | -1, lines: boolean[]): Entry[] => {
+    const d: Pt = [dir[0] * sign, dir[1] * sign];
+    const p: Pt = [-d[1], d[0]];
+    const out: Entry[] = [];
+    lines.forEach((solid, k) => {
+      const off = centerDist + (k - 1) * (t + gap);
+      const m: Pt = [c[0] + d[0] * off, c[1] + d[1] * off];
+      const seg = (a: number, b: number): Entry => [bar([m[0] + p[0] * a, m[1] + p[1] * a], [m[0] + p[0] * b, m[1] + p[1] * b], t), K.black];
+      if (solid) out.push(seg(-len / 2, len / 2));
+      else out.push(seg(-len / 2, -gap * 1.5), seg(gap * 1.5, len / 2));
+    });
+    return out;
+  };
+
+  return [
+    [rect(x, y, w, h), K.white],
+    [circle(c[0], c[1], r), K.blue],
+    [poly(red), K.red],
+    ...trigram(u, -1, [true, true, true]), // geon, top-left
+    ...trigram(u, 1, [false, false, false]), // gon, bottom-right
+    ...trigram(v, 1, [false, true, false]), // gam, top-right
+    ...trigram(v, -1, [true, false, true]), // ri, bottom-left
+  ];
+};
 
 const punchingBag = (x: number): Entry[] => [
   [rect(x - 1.5, 0, 3, 64), K.steel],
@@ -61,7 +105,7 @@ const punchingBag = (x: number): Entry[] => [
 /** Wooden floor, then a checkerboard of mats laid in rows. */
 const floor = (): Entry[] => {
   const out: Entry[] = [[rect(0, 286, 400, 114), K.wood]];
-  for (let x = 0; x < 400; x += 50) if (x !== 300) out.push([rect(x, 286, 3, 22), K.woodDark]);
+  for (let x = 0; x < 400; x += 50) if (x !== 100 && x !== 300) out.push([rect(x, 286, 3, 22), K.woodDark]);
   const rows = [
     { y: 308, h: 26, w: 50 },
     { y: 334, h: 32, w: 66.7 },
@@ -203,10 +247,9 @@ export const taekwondo: ColoringPage = {
     ['M156 88Q178 72 200 86V100H156Z', K.green],
     ['M204 90Q226 76 248 88V100H204Z', K.green],
 
-    ...banner(16, 22),
-    ...banner(276, 22),
+    ...koreanFlag(12, 20, 126),
     ...beltRack(140, 116),
-    ...clock(104, 58),
+    ...clock(310, 60),
     ...punchingBag(372),
     ...floor(),
 
